@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết sân bóng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <!-- Thêm Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <!-- Thêm thư viện từ CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        .container-wrapper {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .pitch-info-title {
+            color: #1e3a8a;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.8rem;
+        }
+
+        .pricing-table-title {
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .price-item {
+            padding: 15px;
+            text-align: center;
+            color: white;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
+        }
+
+        .price-item.booked {
+            background-color: #dc3545;
+            /* Màu đỏ cho đã đặt */
+        }
+
+        .price-item.available {
+            background-color: #28a745;
+            /* Màu xanh cho trống */
+        }
+
+        .breadcrumb {
+            margin-top: 15px;
+            margin-left: 20px;
+        }
+
+        .info-box {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .legend {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .legend span {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+        }
+
+
+        .floating-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 50px;
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            border: none;
+            white-space: nowrap;
+        }
+
+        .floating-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-light shadow">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-dark" href="#">
+                <i class="bi bi-house-door"></i> Trang chủ
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-primary ms-3" href="/matches">
+                            <i class="bi bi-trophy"></i> Trận đấu
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav me-5">
+                    <li class="nav-item dropdown" th:if="${isAuthenticated}">
+                        <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> <span th:text="${username}">Tài khoản</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/user/field-booking"><i class="bi bi-calendar"></i> Quản
+                                    lý lịch đặt</a></li>
+                            <li><a class="dropdown-item" href="/user/profile"><i class="bi bi-receipt"></i> Thông tin cá
+                                    nhân</a></li>
+                            <li><a class="dropdown-item" href="/user/notification"><i class="bi bi-bell"></i> Thông
+                                    báo</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item text-danger" href="/logout"><i
+                                        class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown" th:if="${!isAuthenticated}">
+                        <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> Chưa đăng nhập
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/login"><i class="bi bi-box-arrow-in-right"></i> Đăng
+                                    nhập</a></li>
+                        </ul>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">🏠 Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">⚽ Chi tiết sân</li>
+        </ol>
+    </nav>
+
+    <div class="container container-wrapper">
+
+        <div id="pitchInfo">
+            <h2 class="pitch-info-title">Sân Tiến Định Sport</h2>
+            <div class="info-box">
+                <p><strong>📍 Địa chỉ:</strong> 123 Đường ABC, Quận XYZ, Thành phố Hà Nội</p>
+                <p><strong>⏰ Thời gian mở cửa:</strong> 06:00 - 23:00</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-4">
+                <img src="https://img.thegioithethao.vn/thumbs/san-cau-long/ha-noi/hai-ba-trung/san-cau-long-tien-dinh-sport/san-cau-long-tien-dinh-sport-1_thumb_720.webp"
+                    class="d-block w-100" alt="Sân Tiến Định Sport" id="pitchImage">
+            </div>
+
+            <div class="col-12 col-md-6">
+                <h4 class="pricing-table-title">Khung giờ và giá ngày <input type="date" id="dateFilter"> </h4>
+                <div class="container" id="bookingContainer">
+                    <div class="row g-3">
+                        <div class="col-6 col-lg-2">
+                            <div class="price-item available">
+                                <p>20:00-21:00</p>
+                                <p>50,000 VND</p>
+                                <p>Trống</p>
+
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-2">
+                            <div class="price-item booked">
+                                <p>20:00-21:00</p>
+                                <p>50,000 VND</p>
+                                <p>Đã đặt</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="legend">
+                    <span class="available" style="background-color: #28a745;"></span> Trống
+                    <span class="booked" style="background-color: #dc3545;"></span> Đã đặt
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <button class="floating-btn" data-bs-toggle="modal" data-bs-target="#bookingModal">
+        <i class="bi bi-calendar-check"></i> Đặt sân
+    </button>
+
+    <div id="liveAlertPlaceholder" class="position-absolute top-50 start-50 translate-middle"></div>
+
+    <!-- Booking Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookingModalLabel">Mẫu Đặt Sân</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="bookingForm">
+                        <div class="form-group mb-3">
+                            <label for="matchDate">Chọn ngày</label>
+                            <input type="date" id="matchDate" class="form-control" min="" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="matchHour">Chọn giờ</label>
+                            <select id="matchHour" class="form-control">
+                                <option th:each="hour : ${#numbers.sequence(1, 23)}" th:value="${hour}"
+                                    th:text="${hour + ':00'}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="matchDuration">Chọn số tiếng</label>
+                            <select id="matchDuration" class="form-control">
+                                <option value=60>1 giờ</option>
+                                <option value=90>1.5 giờ</option>
+                                <option value=120>2 giờ</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                        id="confirmBooking">Đặt</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"> </script>
+    <script th:inline="javascript">
+        var isAuthenticated = /*[[${isAuthenticated}]]*/ false;
+        // localStorage.setItem("pitchId", 1);
+        var pitchId = localStorage.getItem("pitchId")
+        $(document).ready(function () {
+            const today = new Date().toISOString().split('T')[0];
+            $("#dateFilter").val(today); // Set giá trị mặc định cho input date
+
+            const fieldId = pitchId; // Giả sử pitchId đã có giá trị
+            loadData(today, fieldId);
+            fetchPitchInfo(fieldId);
+
+            // Sự kiện thay đổi ngày
+            $("#dateFilter").on("change", function () {
+                let selectedDate = $(this).val();
+                loadData(selectedDate, fieldId);
+            });
+
+
+            $("#confirmBooking").click(function () {
+                let date = $("#matchDate").val(); // Lấy ngày
+                let hour = $("#matchHour").val(); // Lấy giờ
+                let duration = $("#matchDuration").val();
+
+                if (!date || !hour || !duration) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Mẫu đặt không hợp lệ!',
+                        text: 'Vui lòng nhập đầy đủ thông tin ngày, giờ và thời lượng!',
+                        confirmButtonText: 'OK'
+                    });
+                    return false; // Ngăn chặn tiếp tục thực hiện hành động
+                }
+                //endcheck
+
+                // Tạo đối tượng Date bằng cách truyền từng phần riêng biệt
+                let [year, month, day] = date.split("-").map(Number);
+                let startTime = new Date(year, month - 1, day, hour, 0, 0); // Tháng bắt đầu từ 0
+
+                // Cộng thêm số phút của duration
+                let endTime = new Date(startTime.getTime() + duration * 60000);
+
+                // Định dạng 'YYYY-MM-DDTHH:mm'
+                let formatDateTime = (dateObj) => {
+                    let y = dateObj.getFullYear();
+                    let m = String(dateObj.getMonth() + 1).padStart(2, '0'); // Tháng +1 vì bắt đầu từ 0
+                    let d = String(dateObj.getDate()).padStart(2, '0');
+                    let h = String(dateObj.getHours()).padStart(2, '0');
+                    let min = String(dateObj.getMinutes()).padStart(2, '0');
+                    return `${y}-${m}-${d}T${h}:${min}`;
+                };
+
+                let formattedStartTime = formatDateTime(startTime);
+                let formattedEndTime = formatDateTime(endTime);
+
+                // alert(`Bắt đầu: ${formattedStartTime}\nKết thúc: ${formattedEndTime}`);
+                // let endHour = parseInt(hour) + parseInt(duration) / 60;
+                // let endTime = `${date}T${String(endHour).padStart(2, '0')}:00`;
+                // alert(startTime + endTime)
+
+
+
+                const userId = localStorage.getItem('userId')
+
+
+                if (isAuthenticated) {
+                    $(document).ready(function () {
+
+                        $.ajax({
+                            url: '/api/booking/create',
+                            method: 'POST',
+                            contentType: 'application/x-www-form-urlencoded',
+                            data: {
+                                startTime: formattedStartTime,
+                                endTime: formattedEndTime,
+                                userId: userId,
+                                pitchId: pitchId
+                            },
+                            success: function (response) {
+                                if (response.status === 1000) {
+                                    Swal.fire({
+                                        title: "Đặt sân thành công!",
+                                        icon: "success"
+                                    });
+
+                                }
+                                else {
+                                    Swal.fire({
+                                        title: "Đặt sân thất bại!",
+                                        text: response.message,
+                                        icon: "error"
+                                    });
+                                }
+                            },
+                            error: function () {
+                                Swal.fire({
+                                    title: "Lỗi kết nối API!",
+                                    icon: "error"
+                                });
+                            }
+                        });
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Bạn chưa đăng nhập",
+                        text: "Bạn có muốn chuyển đến trang đăng nhập không ?",
+                        icon: "info",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Đăng nhập",
+                        cancelButtonText: "Hủy"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/login';
+                        }
+                    });
+
+                }
+
+
+            })
+        });
+
+        function fetchPitchInfo(fieldId) {
+            $.ajax({
+                url: `/api/field/get-info-by-id?id=${fieldId}`,
+                method: "GET",
+                dataType: "json",
+                success: function (response) {
+                    if (response.status === 1000 && response.data.length > 0) {
+                        updatePitchInfo(response.data[0]);
+                    }
+                },
+                error: function (err) {
+                    console.log("Lỗi API:", err);
+                }
+            });
+        }
+
+        /**
+         * Cập nhật giao diện với thông tin sân bóng
+         * @param {Object} pitch - Đối tượng chứa thông tin sân
+         */
+        function updatePitchInfo(pitch) {
+            let fieldType = pitch.type === "11" ? "Sân 11 người" : `Sân ${pitch.type} người`;
+
+            $("#pitchInfo .pitch-info-title").text(pitch.name);
+            $("#pitchInfo .info-box").html(`
+        <p><strong>📍 Địa chỉ:</strong> ${pitch.address}</p>
+        <p><strong>⚽ Loại sân:</strong> ${fieldType}</p>
+        <p><strong>⏰ Thời gian mở cửa:</strong> ${pitch.open_time} - ${pitch.close_time}</p>
+    `);
+            $("#pitchImage").attr("src", pitch.image).attr("alt", pitch.name);
+        }
+
+
+        function loadData(date, fieldId) {
+            const apiUrl = `/api/field/get-pricing-slots?date=${date}&fieldId=${fieldId}`;
+            $.ajax({
+                url: apiUrl,
+                method: "GET",
+                dataType: "json",
+                success: function (response) {
+                    if (response.status === 1000) {
+                        renderBookingSlots(response.data);
+                    }
+                },
+                error: function (err) {
+                    console.log("Lỗi API:", err);
+                }
+            });
+        }
+
+
+        // Hàm hiển thị dữ liệu vào #bookingContainer
+        function renderBookingSlots(data) {
+            let container = $("#bookingContainer .row.g-3");
+            container.empty(); // Xóa dữ liệu cũ
+
+            data.forEach(slot => {
+                let slotHtml = generateSlotHtml(slot);
+                container.append(slotHtml);
+            });
+        }
+
+        // Hàm tạo HTML cho từng khung giờ
+        function generateSlotHtml(slot) {
+            let statusClass = slot.bookingStatus === "Đã đặt" ? "booked" : "available";
+            let formattedTime = formatTime(slot.slotStartTime, slot.slotEndTime);
+
+            return `
+        <div class="col-6 col-lg-2">
+            <div class="price-item ${statusClass}">
+                <p>${formattedTime}</p>
+                <p>${slot.price.toLocaleString()} VND</p>
+                <p>${slot.bookingStatus}</p>
+            </div>
+        </div>`;
+        }
+
+        // Hàm định dạng thời gian "09:00:00 - 10:00:00" -> "09:00-10:00"
+        function formatTime(startTime, endTime) {
+            return startTime.substring(0, 5) + "-" + endTime.substring(0, 5);
+        }
+
+    </script>
+
+</body>
+
+</html>

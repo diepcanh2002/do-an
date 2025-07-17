@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Lịch Đặt Sân</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+
+  <!-- Thêm thư viện từ CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .booking-card {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .status-success {
+      color: green;
+      font-weight: bold;
+    }
+
+    .status-pending {
+      color: orange;
+      font-weight: bold;
+    }
+
+    .status-cancelled {
+      color: red;
+      font-weight: bold;
+    }
+
+    .filter-box {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      max-width: 50%;
+    }
+
+    @media (max-width: 768px) {
+      .filter-box {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg bg-light shadow">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold text-dark" href="#">
+        <i class="bi bi-house-door"></i> Trang chủ
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link text-dark ms-3" href="/matches">
+              <i class="bi bi-trophy"></i> Trận đấu
+            </a>
+          </li>
+        </ul>
+
+        <ul class="navbar-nav me-5">
+          <li class="nav-item dropdown" th:if="${isAuthenticated}">
+            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="bi bi-person-circle"></i> <span th:text="${username}">Tài khoản</span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/user/field-booking"><i class="bi bi-calendar"></i> Quản lý lịch
+                  đặt</a></li>
+              <li><a class="dropdown-item" href="/user/profile"><i class="bi bi-receipt"></i> Thông tin cá nhân</a></li>
+              <li><a class="dropdown-item" href="/user/notification"><i class="bi bi-bell"></i> Thông báo</a></li>
+              <hr class="dropdown-divider">
+          </li>
+          <li><a class="dropdown-item text-danger" href="/logout"><i class="bi bi-box-arrow-right"></i> Đăng
+              xuất</a></li>
+        </ul>
+        </li>
+
+        <li class="nav-item dropdown" th:if="${!isAuthenticated}">
+          <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle"></i> Chưa đăng nhập
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/login"><i class="bi bi-box-arrow-in-right"></i> Đăng
+                nhập</a></li>
+          </ul>
+        </li>
+        </ul>
+
+      </div>
+    </div>
+  </nav>
+
+  <nav aria-label="breadcrumb" class="mt-3 ms-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">🏠 Trang chủ</a></li>
+      <li class="breadcrumb-item active" aria-current="page">📅 Quản lý lịch đặt</li>
+    </ol>
+  </nav>
+
+  <div class="container mt-4">
+    <h4 class="mb-3">📅 Lịch đặt sân </h4>
+
+    <div class="filter-box d-flex flex-wrap align-items-center gap-2">
+      Lịch đặt sân từ <input type="datetime-local" class="form-control" id="startDate" placeholder="Ngày bắt đầu"
+        style="width: 200px;">
+      đến <input type="datetime-local" class="form-control" id="endDate" placeholder="Ngày kết thúc"
+        style="width: 200px;">
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-4 g-3 mt-3" id="schedule-list">
+      <!-- <div class="col">
+        <div class="booking-card p-3">
+          <h5 class="fw-bold">Mã: #12345</h5>
+          <p><strong>Tên sân:</strong> Sân A</p>
+          <p><strong>Địa chỉ:</strong> 123 Đường ABC, TP.HCM</p>
+          <p><strong>Ngày:</strong> 2025-03-26</p>
+          <p><strong>Giờ bắt đầu:</strong> 18:00</p>
+          <p><strong>Giờ kết thúc:</strong> 20:00</p>
+          <p class="status-success">✔ Đã xác nhận</p>
+          <button class="btn btn-primary btn-sm">Xem hóa đơn</button>
+          <button class="btn btn-danger btn-sm">Hủy</button>
+        </div>
+      </div>
+      <div class="col">
+        <div class="booking-card p-3">
+          <h5 class="fw-bold">Mã: #12346</h5>
+          <p><strong>Tên sân:</strong> Sân B</p>
+          <p><strong>Địa chỉ:</strong> 456 Đường XYZ, TP.HCM</p>
+          <p><strong>Ngày:</strong> 2025-03-27</p>
+          <p><strong>Giờ bắt đầu:</strong> 16:00</p>
+          <p><strong>Giờ kết thúc:</strong> 18:00</p>
+          <p class="status-pending">⏳ Chờ xác nhận</p>
+          <button class="btn btn-primary btn-sm">Xem hóa đơn</button>
+          <button class="btn btn-danger btn-sm">Hủy</button>
+        </div>
+      </div>
+      <div class="col">
+        <div class="booking-card p-3">
+          <h5 class="fw-bold">Mã: #12347</h5>
+          <p><strong>Tên sân:</strong> Sân C</p>
+          <p><strong>Địa chỉ:</strong> 789 Đường LMN, TP.HCM</p>
+          <p><strong>Ngày:</strong> 2025-03-28</p>
+          <p><strong>Giờ bắt đầu:</strong> 19:00</p>
+          <p><strong>Giờ kết thúc:</strong> 21:00</p>
+          <p class="status-cancelled">❌ Đã hủy</p>
+          <button class="btn btn-primary btn-sm">Xem hóa đơn</button>
+          <button class="btn btn-danger btn-sm" disabled>Hủy</button>
+        </div>
+      </div>
+    </div> -->
+
+
+    </div>
+</body>
+<script>
+  let userId = localStorage.getItem("userId")
+  $(document).ready(function () {
+    const now = new Date();
+    const sevenDaysLater = new Date();
+    sevenDaysLater.setDate(now.getDate() + 7);
+
+    // Định dạng ngày giờ thành chuỗi ISO 8601 nhưng loại bỏ phần giây và ký tự "Z"
+    const formatDateTime = (date) => date.toISOString().slice(0, 16);
+
+    // Gán giá trị mặc định cho input
+    $('#startDate').val(formatDateTime(now));
+    $('#endDate').val(formatDateTime(sevenDaysLater));
+
+    // Gọi loadData lần đầu với giá trị mặc định
+    loadData($('#startDate').val(), $('#endDate').val(), userId);
+
+    // Thêm sự kiện khi thay đổi giá trị input
+    $('#startDate, #endDate').on('change', function () {
+      const startTime = $('#startDate').val();
+      const endTime = $('#endDate').val();
+
+      loadData(startTime, endTime, userId);
+    });
+  });
+
+
+
+  function loadData(startTime, endTime, userId) {
+    $.ajax({
+      url: `/api/booking/get-booking-by-range-and-user-id?startTime=${startTime}&endTime=${endTime}&userId=${userId}`,
+      method: 'GET',
+      dataType: 'json',
+      success: function (response) {
+        if (response.status === 1000 && response.data) {
+          const scheduleList = $('#schedule-list');
+          scheduleList.empty();
+
+          response.data.forEach(item => {
+            let statusClass = '';
+            let statusText = '';
+            let disableInvoice = '';
+            let disableCancel = '';
+
+            switch (item.status) {
+              case 'CONFIRMED':
+                statusClass = 'status-success';
+                statusText = '✔ Đã xác nhận';
+                disableCancel = 'disabled';
+                break;
+              case 'PENDING':
+                statusClass = 'status-pending';
+                statusText = '⏳ Chờ xác nhận';
+                disableInvoice = 'disabled';
+                break;
+              case 'CANCELED':
+                statusClass = 'status-cancelled';
+                statusText = '❌ Đã hủy';
+                disableInvoice = 'disabled';
+                disableCancel = 'disabled';
+                break;
+            }
+
+            const bookingCard = `
+                        <div class="col">
+                            <div class="booking-card p-3">
+                                <h5 class="fw-bold">Mã: #${item.id}</h5>
+                                <p><strong>Tên sân:</strong> ${item.field}</p>
+                                <p><strong>Địa chỉ:</strong> ${item.address}</p>
+                                <p><strong>Ngày:</strong> ${item.date}</p>
+                                <p><strong>Giờ bắt đầu:</strong> ${item.start_time}</p>
+                                <p><strong>Giờ kết thúc:</strong> ${item.end_time}</p>
+                                <p class="${statusClass}">${statusText}</p>
+                                <button class="btn btn-primary btn-sm" ${disableInvoice}
+                                onclick=seeDetailBill(${item.id})
+                                >Xem hóa đơn</button>
+                                <button class="btn btn-danger btn-sm" ${disableCancel}
+                                onclick=cancelBooking(${item.id})
+                                >Hủy</button>
+                            </div>
+                        </div>
+                    `;
+            scheduleList.append(bookingCard);
+          });
+        }
+      },
+      error: function (error) {
+        console.error('Lỗi khi tải dữ liệu:', error);
+      }
+    });
+  }
+
+  function seeDetailBill(id) {
+    localStorage.setItem("bookingId", id)
+    window.location.href = '/user/booking-bill'
+  }
+  function cancelBooking(id) {
+    Swal.fire({
+      title: "Bạn có chắc chắn muốn hủy đặt có mã là " + id + " không ?",
+      // text: "Hành động này không thể hoàn tác!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có",
+      cancelButtonText: "Không"
+    }).then((result) => {
+      if (result.isConfirmed) {
+
+        $.ajax({
+          url: "/api/booking/cancel-booking-for-user",
+          type: "POST",
+          data: { bookingId: id },
+          success: function (response) {
+            // alert(response.message); // Hiển thị thông báo từ server
+            Swal.fire("Đã hủy lịch đặt!", response.message, "success").then(() => {
+              location.reload(); // Reload trang sau khi người dùng nhấn OK
+            });
+          },
+          error: function (xhr) {
+            // alert("Có lỗi xảy ra: " + xhr.responseText);
+            Swal.fire("Đã hủy lịch đặt!", xhr.responseText, "error");
+          }
+        });
+      }
+    });
+  }
+
+</script>
+
+</html>

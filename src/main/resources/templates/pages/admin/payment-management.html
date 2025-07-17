@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Tables - SB Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+    <link href="/css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+
+    <!-- Thêm thư viện từ CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="sb-nav-fixed">
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+        <!-- Navbar Brand-->
+        <a class="navbar-brand ps-3" href="/admin/">PitchAdmin</a>
+        <!-- Sidebar Toggle-->
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i
+                class="fas fa-bars"></i></button>
+        <!-- Navbar Search-->
+        <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+
+        </form>
+        <!-- Navbar-->
+        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                    <li>
+                        <hr class="dropdown-divider" />
+                    </li>
+                    <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    <div id="layoutSidenav">
+
+
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+
+                    <div class="nav">
+                        <div class="sb-sidenav-menu-heading">Core</div>
+                        <a class="nav-link" href="/admin/">
+                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                            Thống kê
+                        </a>
+                        <div class="sb-sidenav-menu-heading">Quản lý</div>
+                        <a class="nav-link" href="/admin/pitch-management">
+                            <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                            Sân bóng
+                        </a>
+                        <a class="nav-link" href="/admin/booking-management">
+                            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                            Lịch đặt sân
+                        </a>
+                        <a class="nav-link active" href="/admin/payment-management">
+                            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                            Thanh toán
+                        </a>
+                        <a class="nav-link" href="/admin/team-management">
+                            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                            Đội bóng
+                        </a>
+                        <a class="nav-link" href="/admin/match-management">
+                            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                            Trận đấu
+                        </a>
+                        <a class="nav-link" href="/admin/user-management">
+                            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                            Người dùng
+                        </a>
+                    </div>
+
+
+                </div>
+                <div class="sb-sidenav-footer">
+                    <div class="small">Logged in as:</div>
+                    Start Bootstrap
+                </div>
+            </nav>
+        </div>
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid px-4">
+                    <h1 class="mt-4">Quản lý thanh toán</h1>
+                    <ol class="breadcrumb mb-4">
+                        <li class="breadcrumb-item"><a href="index.html">Quản lý</a></li>
+                        <li class="breadcrumb-item active">Thanh toán</li>
+                    </ol>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <i class="fas fa-table me-1"></i>
+                            Danh sách hóa đơn từ <input type="date" id="startDateFilter"> đến <input type="date"
+                                id="endDateFilter">
+                        </div>
+                        <div class="card-body">
+                            <table id="datatablesSimple">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <footer class="py-4 bg-light mt-auto">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
+                        <div>
+                            <a href="#">Privacy Policy</a>
+                            &middot;
+                            <a href="#">Terms &amp; Conditions</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <script src="/js/scripts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
+        crossorigin="anonymous"></script>
+    <script>
+
+        // let dataTable;
+
+        // document.addEventListener("DOMContentLoaded", function () {
+        //     let today = new Date();
+        //     let sevenDaysLater = new Date();
+        //     sevenDaysLater.setDate(today.getDate() + 7);
+
+        //     // Định dạng ngày thành yyyy-MM-dd
+        //     let formatDate = (date) => date.toISOString().split('T')[0];
+
+        //     // Gán giá trị mặc định cho input
+        //     let startDate = formatDate(today);
+        //     let endDate = formatDate(sevenDaysLater);
+
+        //     $("#startDateFilter").val(startDate);
+        //     $("#endDateFilter").val(endDate);
+
+        //     // Gọi API lấy dữ liệu ban đầu
+        //     fetchPaymentData(startDate, endDate);
+
+        //     // Xử lý sự kiện thay đổi input ngày
+        //     $("#startDateFilter, #endDateFilter").on("change", function () {
+        //         startDate = $("#startDateFilter").val();
+        //         endDate = $("#endDateFilter").val();
+        //         fetchPaymentData(startDate, endDate);
+        //     });
+        // });
+
+        // function fetchPaymentData(startDate, endDate) {
+        //     fetch(`/api/payment/get-by-range?startTime=${startDate}&endTime=${endDate}`)
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             if (data.status !== 1000 || !data.data) {
+        //                 console.error("Lỗi khi lấy dữ liệu thanh toán!");
+        //                 return;
+        //             }
+
+        //             if (!data.data.length) {
+        //                 console.warn("Không có dữ liệu thanh toán!");
+        //                 if (dataTable) {
+        //                     dataTable.destroy();
+        //                     dataTable = null;
+        //                 }
+        //                 return;
+        //             }
+
+        //             const statusMap = {
+        //                 "PENDING": { text: "Chờ thanh toán", color: "text-bg-warning" },
+        //                 "PAID": { text: "Đã thanh toán", color: "text-bg-success" },
+        //                 "FAILED": { text: "Đã hủy", color: "text-bg-danger" },
+        //                 "REFUNDED": { text: "Chưa hoàn trả", color: "text-bg-info" }
+        //             };
+
+        //             const paymentMethodMap = {
+        //                 "CASH": "Tiền mặt",
+        //                 "CREDIT_CARD": "Thẻ tín dụng",
+        //                 "BANK_TRANSFER": "Chuyển khoản"
+        //             };
+
+        //             const payments = data.data.map(payment => {
+        //                 const startDate = new Date(payment.start_time);
+        //                 const status = statusMap[payment.status] || { text: "Không xác định", color: "text-bg-dark" };
+        //                 const paymentMethod = paymentMethodMap[payment.payment_method] || "Không xác định";
+
+        //                 let actionButtons = "";
+        //                 if (payment.status === "PENDING") {
+        //                     actionButtons = `
+        //                 <button class="btn btn-warning btn-sm" onclick="confirmPayment(${payment.id})">Xác nhận</button>
+        //                 <button class="btn btn-danger btn-sm" onclick="cancelPayment(${payment.id})">Hủy</button>
+        //                 <button class="btn btn-primary btn-sm" onclick="changePaymentMethod(${payment.id},'${payment.payment_method}')">Đổi phương thức</button>
+        //             `;
+        //                 }
+
+        //                 return [
+        //                     payment.id,
+        //                     payment.full_name,
+        //                     payment.field,
+        //                     startDate.toISOString().split('T')[0] + " " + startDate.toTimeString().split(' ')[0],
+        //                     payment.duration + " phút",
+        //                     payment.total.toLocaleString() + " VND",
+        //                     `<span class="badge ${status.color}">${status.text}</span>`,
+        //                     paymentMethod,
+        //                     actionButtons
+        //                 ];
+        //             });
+
+        //             if (dataTable) {
+        //                 dataTable.destroy();
+        //                 dataTable = null;
+        //             }
+
+        //             const tableElement = document.getElementById("datatablesSimple");
+        //             if (!tableElement) {
+        //                 console.error("Phần tử bảng không tồn tại!");
+        //                 return;
+        //             }
+        //             tableElement.innerHTML = "";
+
+        //             dataTable = new simpleDatatables.DataTable("#datatablesSimple", {
+        //                 data: {
+        //                     headings: ["ID", "Người thuê", "Sân thuê", "Thời gian", "Thời lượng", "Tổng tiền", "Trạng thái", "Phương thức thanh toán", "Hành động"],
+        //                     data: payments
+        //                 },
+        //                 columns: [{ select: 8, sortable: false }],
+        //                 labels: {
+        //                     placeholder: "Tìm kiếm...",
+        //                     noRows: "Không có dữ liệu",
+        //                     info: "Hiển thị {start} - {end} của {rows} thanh toán",
+        //                     noResults: "Không tìm thấy kết quả"
+        //                 }
+        //             });
+        //         })
+        //         .catch(error => console.error("Lỗi khi gọi API:", error));
+        // }
+
+        let dataTable;
+
+        document.addEventListener("DOMContentLoaded", function () {
+            let today = new Date();
+            let sevenDaysLater = new Date();
+            sevenDaysLater.setDate(today.getDate() + 7);
+
+            let formatDate = (date) => date.toISOString().split('T')[0];
+
+            let startDate = formatDate(today);
+            let endDate = formatDate(sevenDaysLater);
+
+            $("#startDateFilter").val(startDate);
+            $("#endDateFilter").val(endDate);
+
+            fetchPaymentData(startDate, endDate);
+
+            $("#startDateFilter, #endDateFilter").on("change", function () {
+                startDate = $("#startDateFilter").val();
+                endDate = $("#endDateFilter").val();
+                fetchPaymentData(startDate, endDate);
+            });
+        });
+
+        function fetchPaymentData(startDate, endDate) {
+            fetch(`/api/payment/get-by-range?startTime=${startDate}&endTime=${endDate}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status !== 1000 || !data.data) {
+                        console.error("Lỗi khi lấy dữ liệu thanh toán!");
+                        return;
+                    }
+
+                    if (!data.data.length) {
+                        console.warn("Không có dữ liệu thanh toán!");
+                        if (dataTable) {
+                            dataTable.destroy();
+                            dataTable = null;
+                        }
+                        return;
+                    }
+
+                    const statusMap = {
+                        "PENDING": { text: "Chờ thanh toán", color: "text-bg-warning" },
+                        "PAID": { text: "Đã thanh toán", color: "text-bg-success" },
+                        "FAILED": { text: "Đã hủy", color: "text-bg-danger" },
+                        "REFUNDED": { text: "Chưa hoàn trả", color: "text-bg-info" }
+                    };
+
+                    const paymentMethodMap = {
+                        "CASH": "Tiền mặt",
+                        "CREDIT_CARD": "Thẻ tín dụng",
+                        "BANK_TRANSFER": "Chuyển khoản"
+                    };
+
+                    const payments = data.data.map(payment => {
+                        const startDate = new Date(payment.start_time);
+                        const status = statusMap[payment.status] || { text: "Không xác định", color: "text-bg-dark" };
+                        const paymentMethod = paymentMethodMap[payment.payment_method] || "Không xác định";
+
+                        let actionButtons = "";
+                        if (payment.status === "PENDING") {
+                            actionButtons = `
+                        <button class="btn btn-success  btn-sm" onclick="confirmPayment(${payment.id})">Xác nhận</button>
+                        <button class="btn btn-danger btn-sm" onclick="cancelPayment(${payment.id})">Hủy</button>
+                        <button class="btn btn-primary btn-sm" onclick="changePaymentMethod(${payment.id},'${payment.payment_method}')">Đổi phương thức</button>
+                    `;
+                        }
+
+                        if (payment.status === "REFUNDED") {
+                            actionButtons += `
+                        <button class="btn btn-warning btn-sm" onclick="refundPayment(${payment.id})">Hoàn trả</button>
+                    `;
+                        }
+
+                        return [
+                            payment.id,
+                            payment.full_name,
+                            payment.field,
+                            startDate.toISOString().split('T')[0] + " " + startDate.toTimeString().split(' ')[0],
+                            payment.duration + " phút",
+                            payment.total.toLocaleString() + " VND",
+                            `<span class="badge ${status.color}">${status.text}</span>`,
+                            paymentMethod,
+                            actionButtons
+                        ];
+                    });
+
+                    if (dataTable) {
+                        dataTable.destroy();
+                        dataTable = null;
+                    }
+
+                    const tableElement = document.getElementById("datatablesSimple");
+                    if (!tableElement) {
+                        console.error("Phần tử bảng không tồn tại!");
+                        return;
+                    }
+                    tableElement.innerHTML = "";
+
+                    dataTable = new simpleDatatables.DataTable("#datatablesSimple", {
+                        data: {
+                            headings: ["ID", "Người thuê", "Sân thuê", "Thời gian", "Thời lượng", "Tổng tiền", "Trạng thái", "Phương thức thanh toán", "Hành động"],
+                            data: payments
+                        },
+                        columns: [{ select: 8, sortable: false }],
+                        labels: {
+                            placeholder: "Tìm kiếm...",
+                            noRows: "Không có dữ liệu",
+                            info: "Hiển thị {start} - {end} của {rows} thanh toán",
+                            noResults: "Không tìm thấy kết quả"
+                        }
+                    });
+                })
+                .catch(error => console.error("Lỗi khi gọi API:", error));
+        }
+
+        function refundPayment(paymentId) {
+            // alert("Hoàn trả cho thanh toán ID: " + paymentId);
+
+            Swal.fire({
+                title: "Bạn muốn hoàn tiền thanh toán này không ?",
+                text: "Hành động này không thể hoàn tác!",
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Xác nhận",
+                cancelButtonText: "Hủy"
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+
+                    $.ajax({
+                        url: "/api/payment/refund?paymentId=" + paymentId,
+                        type: "POST",
+                        success: function (response) {
+                            if (response.status == 1000) {
+                                Swal.fire({
+                                    title: "Hoàn tiền thành công!",
+                                    text: response.message,
+                                    icon: "success",
+                                    confirmButtonText: "OK"
+                                }).then(() => {
+                                    location.reload(); // Reload sau khi đóng thông báo
+                                })
+
+                            } else {
+                                Swal.fire({
+                                    title: "Hoàn tiền thanh toán thất bại!",
+                                    // text: response.message,
+                                    icon: "danger",
+                                    confirmButtonText: "OK"
+                                }).then(() => {
+                                    location.reload(); // Reload sau khi đóng thông báo
+                                })
+                            }
+                        },
+                        error: function (xhr) {
+                            // alert("Sửa thất bại: " + xhr.responseText);
+                        }
+                    })
+                }
+
+            })
+        }
+
+
+
+
+
+        function cancelPayment(id) {
+            // alert("Chức năng chỉnh sửa thanh toán " + id);
+            Swal.fire({
+                title: "Bạn có chắc hủy thanh toán này không ?",
+                text: "Hành động này không thể hoàn tác!",
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Xác nhận",
+                cancelButtonText: "Hủy"
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+
+                    $.ajax({
+                        url: "/api/payment/cancel?paymentId=" + id,
+                        type: "POST",
+                        success: function (response) {
+                            if (response.status == 1000) {
+                                Swal.fire({
+                                    title: "Hủy thanh toán thành công!",
+                                    icon: "success",
+                                    confirmButtonText: "OK"
+                                }).then(() => {
+                                    location.reload(); // Reload sau khi đóng thông báo
+                                })
+
+                            } else {
+                                Swal.fire({
+                                    title: "Hủy thanh toán thất bại!",
+                                    // text: response.message,
+                                    icon: "danger",
+                                    confirmButtonText: "OK"
+                                }).then(() => {
+                                    location.reload(); // Reload sau khi đóng thông báo
+                                })
+                            }
+                        },
+                        error: function (xhr) {
+                            // alert("Sửa thất bại: " + xhr.responseText);
+                        }
+                    })
+                }
+
+            })
+        }
+
+        function confirmPayment(id) {
+            Swal.fire({
+                title: "Bạn có chắc xác nhận thanh toán này không ?",
+                text: "Hành động này không thể hoàn tác!",
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Xác nhận",
+                cancelButtonText: "Hủy"
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+
+                    $.ajax({
+                        url: "/api/payment/confirm?paymentId=" + id,
+                        type: "POST",
+                        success: function (response) {
+                            if (response.status == 1000) {
+                                Swal.fire({
+                                    title: "Xác nhận thanh toán thành công!",
+                                    icon: "success",
+                                    confirmButtonText: "OK"
+                                }).then(() => {
+                                    location.reload(); // Reload sau khi đóng thông báo
+                                })
+
+                            } else {
+                                Swal.fire({
+                                    title: "Xác nhận thanh toán thất bại!",
+                                    // text: response.message,
+                                    icon: "danger",
+                                    confirmButtonText: "OK"
+                                }).then(() => {
+                                    location.reload(); // Reload sau khi đóng thông báo
+                                })
+                            }
+                        },
+                        error: function (xhr) {
+                            // alert("Sửa thất bại: " + xhr.responseText);
+                        }
+                    })
+
+                }
+
+            })
+        }
+
+        function changePaymentMethod(id, method) {
+            if (method == 'CASH') {
+                Swal.fire({
+                    title: "Bạn có muốn đổi sang thanh toán bằng chuyển khoản không ?",
+                    text: "Hành động này không thể hoàn tác!",
+                    icon: "info",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Xác nhận",
+                    cancelButtonText: "Hủy"
+                }).then((result) => {
+                    $.ajax({
+                        url: "/api/payment/changeMethodPayment",
+                        type: "POST",
+                        data: {
+                            method: 'BANK_TRANSFER',
+                            paymentId: id
+                        },
+                        success: function (response) {
+                            if (response.status == 1000) {
+                                Swal.fire({
+                                    title: "Đổi phương thức thanh toán thành công!",
+                                    icon: "success",
+                                    confirmButtonText: "OK"
+                                }).then(() => {
+                                    location.reload(); // Reload sau khi đóng thông báo
+                                })
+
+                            } else {
+                                Swal.fire({
+                                    title: "Đổi phương thức thanh toán thất bại!",
+                                    // text: response.message,
+                                    icon: "danger",
+                                    confirmButtonText: "OK"
+                                }).then(() => {
+                                    location.reload(); // Reload sau khi đóng thông báo
+                                })
+                            }
+                        },
+                        error: function (xhr) {
+                            // alert("Sửa thất bại: " + xhr.responseText);
+                        }
+                    })
+
+                })
+            } else {
+                Swal.fire({
+                    title: "Bạn có muốn đổi sang thanh toán bằng tiền mặt không?",
+                    text: "Hành động này không thể hoàn tác!",
+                    icon: "info",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Xác nhận",
+                    cancelButtonText: "Hủy"
+                }).then((result) => {
+                    $.ajax({
+                        url: "/api/payment/changeMethodPayment",
+                        type: "POST",
+                        data: {
+                            method: 'CASH',
+                            paymentId: id
+                        },
+                        success: function (response) {
+                            if (response.status == 1000) {
+                                Swal.fire({
+                                    title: "Đổi phương thức thanh toán thành công!",
+                                    icon: "success",
+                                    confirmButtonText: "OK"
+                                }).then(() => {
+                                    location.reload(); // Reload sau khi đóng thông báo
+                                })
+
+                            } else {
+                                Swal.fire({
+                                    title: "Đổi phương thức thanh toán thất bại!",
+                                    // text: response.message,
+                                    icon: "danger",
+                                    confirmButtonText: "OK"
+                                }).then(() => {
+                                    location.reload(); // Reload sau khi đóng thông báo
+                                })
+                            }
+                        },
+                        error: function (xhr) {
+                            // alert("Sửa thất bại: " + xhr.responseText);
+                        }
+                    })
+
+                })
+
+            }
+        }
+
+    </script>
+</body>
+
+</html>

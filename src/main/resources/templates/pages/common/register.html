@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Register - SB Admin</title>
+    <link href="css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+
+<body class="bg-primary">
+    <div id="layoutAuthentication">
+        <div id="layoutAuthentication_content">
+            <main>
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-7">
+                            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                                <div class="card-header">
+                                    <h3 class="text-center font-weight-light my-4">Tạo tài khoản</h3>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="username" type="text"
+                                                   required oninvalid="this.setCustomValidity('Vui lòng nhập mật khẩu')"
+                                                   oninput="this.setCustomValidity('')" />
+                                            <label for="username">Tên tài khoản</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="fullName" type="text"
+                                                   required oninvalid="this.setCustomValidity('Vui lòng nhập mật khẩu')"
+                                                   oninput="this.setCustomValidity('')" />
+                                            <label for="username">Họ tên</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="phone" type="text"
+                                                   required oninvalid="this.setCustomValidity('Vui lòng nhập mật khẩu')"
+                                                   oninput="this.setCustomValidity('')"/>
+                                            <label for="phone">Số điện thoại</label>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3 mb-md-0">
+                                                    <input class="form-control" id="inputPassword" type="password"
+                                                           required oninvalid="this.setCustomValidity('Vui lòng nhập mật khẩu')"
+                                                           oninput="this.setCustomValidity('')" />
+                                                    <label for="inputPassword">Mật khẩu</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3 mb-md-0">
+                                                    <input class="form-control" id="inputPasswordConfirm"
+                                                        type="password" required oninvalid="this.setCustomValidity('Vui lòng nhập mật khẩu')"
+                                                           oninput="this.setCustomValidity('')" />
+                                                    <label for="inputPasswordConfirm">Xác nhận mật khẩu</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 mb-0">
+                                            <div class="d-grid"><a class="btn btn-primary btn-block" id="register">Tạo
+                                                    tài khoản</a></div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="card-footer text-center py-3">
+                                    <div class="small"><a href="/login">Đã có tài khoản? Đăng nhập</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#register').click(function () {
+                var username = $('#username').val();
+                var phone = $('#phone').val();
+                var password = $('#inputPassword').val();
+                var confirmPassword = $('#inputPasswordConfirm').val();
+                var fullName = $('#fullName').val();
+
+                // Kiểm tra tên tài khoản
+                if (username === '') {
+                    alert('Vui lòng nhập tên tài khoản');
+                    return false;
+                }
+                if (fullName === '') {
+                    alert('Vui lòng nhập họ tên');
+                    return false;
+                }
+
+                // Kiểm tra số điện thoại (kiểm tra cơ bản, có thể cải tiến thêm regex cho số điện thoại hợp lệ)
+                var phoneRegex = /^[0-9]{10,11}$/;
+                if (!phoneRegex.test(phone)) {
+                    alert('Số điện thoại không hợp lệ');
+                    return false;
+                }
+
+                // Kiểm tra mật khẩu
+                if (password === '') {
+                    alert('Vui lòng nhập mật khẩu');
+                    return false;
+                }
+
+                // Kiểm tra xác nhận mật khẩu
+                if (confirmPassword === '') {
+                    alert('Vui lòng xác nhận mật khẩu');
+                    return false;
+                }
+
+                // Kiểm tra mật khẩu và xác nhận mật khẩu có khớp không
+                if (password !== confirmPassword) {
+                    alert('Mật khẩu và xác nhận mật khẩu không khớp');
+                    return false;
+                }
+
+                $.ajax({
+                    url: '/api/user/register',
+                    type: 'POST',
+                    data: {
+                        username: username,
+                        phone: phone,
+                        fullName: fullName,
+                        password: password
+                    },
+                    success: function (response) {
+                        if (response.status === 1000) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Đăng ký thành công!',
+                                text: 'Bạn có thể đăng nhập ngay bây giờ.',
+                                confirmButtonText: 'OK'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = "/login"; // Chuyển hướng sang trang đăng nhập
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi!',
+                                text: response.message,
+                                confirmButtonText: 'Thử lại'
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Có lỗi xảy ra!',
+                            text: 'Vui lòng thử lại sau.',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+
+
+
+            });
+        });
+    </script>
+</body>
+
+</html>

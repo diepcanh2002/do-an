@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách trận đấu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .match-card {
+            background-color: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .team-logo {
+            width: 50px;
+            height: 50px;
+        }
+
+        .score {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .match-status {
+            display: block;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .upcoming {
+            color: green;
+        }
+
+        .finished {
+            color: red;
+        }
+
+        .match-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header (Navbar) -->
+    <nav class="navbar navbar-expand-lg bg-light shadow">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-dark" href="/">
+                <i class="bi bi-house-door"></i> Trang chủ
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-primary ms-3" href="/matches">
+                            <i class="bi bi-trophy"></i> Trận đấu
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav me-5">
+                    <li class="nav-item dropdown" th:if="${isAuthenticated}">
+                        <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> <span th:text="${username}">Tài khoản</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/user/field-booking"><i class="bi bi-calendar"></i> Quản
+                                    lý lịch đặt</a></li>
+                            <li><a class="dropdown-item" href="/user/profile"><i class="bi bi-receipt"></i> Thông tin cá
+                                    nhân</a></li>
+                            <li><a class="dropdown-item" href="/user/notification"><i class="bi bi-bell"></i> Thông
+                                    báo</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item text-danger" href="/logout"><i
+                                        class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown" th:if="${!isAuthenticated}">
+                        <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> Chưa đăng nhập
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/login"><i class="bi bi-box-arrow-in-right"></i> Đăng
+                                    nhập</a></li>
+                        </ul>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">🏠 Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">⚽ Trận đấu</li>
+        </ol>
+    </nav>
+
+
+    <div class="container">
+        <h2 class="text-center text-primary">Danh sách trận đấu</h2>
+
+        <!-- Bộ lọc theo khoảng ngày -->
+        <div class="mb-4 d-flex align-items-center justify-content-center">
+            <div class="card shadow-sm p-3 bg-white">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label for="startDate" class="fw-bold">Từ</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" class="form-control w-auto" id="startDate">
+                    </div>
+                    <div class="col-auto">
+                        <label for="endDate" class="fw-bold">đến</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" class="form-control w-auto" id="endDate">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <!-- Danh sách trận đấu -->
+        <div id="matches-list" class="row">
+            <div class="col-md-6 col-12">
+                <div class="match-card text-center">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="team text-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg"
+                                alt="Đội A" class="team-logo">
+                            <h5 class="mt-2">Man United</h5>
+                        </div>
+                        <div>
+                            <div class="score">2 - 1</div>
+                            <span class="match-status finished">🔴 Đã kết thúc</span>
+                        </div>
+                        <div class="team text-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg" alt="Đội B"
+                                class="team-logo">
+                            <h5 class="mt-2">Chelsea</h5>
+                        </div>
+                    </div>
+                    <p class="text-center match-info">⏰ 19:00 - 21:00 | 📍 Sân Mỹ Đình | 🗓 Ngày: 2025-03-22</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-12">
+                <div class="match-card text-center">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="team text-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/6/63/FC_Barcelona_%28crest%29.svg"
+                                alt="Đội A" class="team-logo">
+                            <h5 class="mt-2">Barcelona</h5>
+                        </div>
+                        <div>
+                            <div class="score">-</div>
+                            <span class="match-status upcoming">🟢 Sắp diễn ra</span>
+                        </div>
+                        <div class="team text-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Real_Madrid_CF.svg" alt="Đội B"
+                                class="team-logo">
+                            <h5 class="mt-2">Real Madrid</h5>
+                        </div>
+                    </div>
+                    <p class="text-center match-info">⏰ 21:00 - 23:00 | 📍 Camp Nou | 🗓 Ngày: 2025-03-23</p>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <script>
+        $(document).ready(function () {
+            function formatDateTime(date) {
+                let pad = (num) => num.toString().padStart(2, '0');
+                return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+            }
+
+            function getMatchStatus(status) {
+                switch (status) {
+                    case "NOT_STARTED": return { text: "🟢 Sắp diễn ra", class: "upcoming" };
+                    case "FINISHED": return { text: "🔴 Đã kết thúc", class: "finished" };
+                    case "IN_PROGRESS": return { text: "🟡 Đang diễn ra", class: "in-progress" };
+                    case "CANCELED": return { text: "⚫ Đã hủy", class: "canceled" };
+                    default: return { text: "⚪ Không xác định", class: "unknown" };
+                }
+            }
+
+            function loadMatches() {
+                let startDate = $("#startDate").val();
+                let endDate = $("#endDate").val();
+
+                let apiUrl = `/api/match/get-by-range?startTime=${startDate}T00:00:00&endTime=${endDate}T23:59:59`;
+                console.log("Fetching data from:", apiUrl);
+
+                $.ajax({
+                    url: apiUrl,
+                    type: "GET",
+                    dataType: "json",
+                    success: function (response) {
+
+                        $("#matches-list").empty();
+                        response.data.forEach(function (match) {
+                            let matchStatus = getMatchStatus(match.status);
+                            let matchHtml = `
+                        <div class="col-md-6 col-12">
+                            <div class="match-card text-center">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="team text-center">
+                                        <img src="${match.leftTeamImageUrl}" alt="${match.leftTeam}" class="team-logo">
+                                        <h5 class="mt-2">${match.leftTeam}</h5>
+                                    </div>
+                                    <div>
+                                        <div class="score">${match.leftTeamScored} - ${match.rightTeamScored}</div>
+                                        <span class="match-status ${matchStatus.class}">${matchStatus.text}</span>
+                                    </div>
+                                    <div class="team text-center">
+                                        <img src="${match.rightTeamImageUrl}" alt="${match.rightTeam}" class="team-logo">
+                                        <h5 class="mt-2">${match.rightTeam}</h5>
+                                    </div>
+                                </div>
+                                <p class="text-center match-info">
+                                    ⏰ ${match["TIME(m.start_time)"]} - ${match["TIME(m.end_time)"]} | 📍 ${match.field} | 🗓 Ngày: ${match["DATE(m.start_time)"]}
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                            $("#matches-list").append(matchHtml);
+                        });
+                    },
+                    error: function (error) {
+                        console.log("Lỗi khi tải dữ liệu:", error);
+                    }
+                });
+            }
+
+            // Thiết lập giá trị mặc định cho input ngày
+            let now = new Date();
+            let sevenDaysLater = new Date();
+            sevenDaysLater.setDate(now.getDate() + 7);
+
+            $("#startDate").val(now.toISOString().split("T")[0]);
+            $("#endDate").val(sevenDaysLater.toISOString().split("T")[0]);
+
+            loadMatches(); // Gọi API lần đầu khi trang load
+
+            $("#startDate, #endDate").on("change", function () {
+                loadMatches();
+            });
+        });
+
+
+    </script>
+
+</body>
+
+</html>

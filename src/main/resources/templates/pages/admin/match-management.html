@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Tables - SB Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+    <link href="/css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+
+<body class="sb-nav-fixed">
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+        <!-- Navbar Brand-->
+        <a class="navbar-brand ps-3" href="/admin/">PitchAdmin</a>
+        <!-- Sidebar Toggle-->
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i
+                class="fas fa-bars"></i></button>
+        <!-- Navbar Search-->
+        <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+
+        </form>
+        <!-- Navbar-->
+        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                    <li>
+                        <hr class="dropdown-divider" />
+                    </li>
+                    <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    <div id="layoutSidenav">
+
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+
+                    <div class="nav">
+                        <div class="sb-sidenav-menu-heading">Core</div>
+                        <a class="nav-link" href="/admin/">
+                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                            Thống kê
+                        </a>
+                        <div class="sb-sidenav-menu-heading">Quản lý</div>
+                        <a class="nav-link" href="/admin/pitch-management">
+                            <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                            Sân bóng
+                        </a>
+                        <a class="nav-link" href="/admin/booking-management">
+                            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                            Lịch đặt sân
+                        </a>
+                        <a class="nav-link" href="/admin/payment-management">
+                            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                            Thanh toán
+                        </a>
+                        <a class="nav-link" href="/admin/team-management">
+                            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                            Đội bóng
+                        </a>
+                        <a class="nav-link active" href="/admin/match-management">
+                            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                            Trận đấu
+                        </a>
+                        <a class="nav-link" href="/admin/user-management">
+                            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                            Người dùng
+                        </a>
+                    </div>
+
+
+                </div>
+                <div class="sb-sidenav-footer">
+                    <div class="small">Logged in as:</div>
+                    Start Bootstrap
+                </div>
+            </nav>
+        </div>
+
+
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid px-4">
+                    <h1 class="mt-4">Quản lý trận đấu</h1>
+                    <ol class="breadcrumb mb-4">
+                        <li class="breadcrumb-item"><a href="/admin/">Quản lý</a></li>
+                        <li class="breadcrumb-item active">Trận đấu</li>
+                    </ol>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <button class="btn btn-success" onclick="openAddPitchModal()">Thêm trận mới</button>
+                        </div>
+                    </div>
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <i class="fas fa-table me-1"></i>
+                            Danh sách trận đấu
+                        </div>
+                        <div class="card-body">
+                            <table id="datatablesSimple">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <footer class="py-4 bg-light mt-auto">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
+                        <div>
+                            <a href="#">Privacy Policy</a>
+                            &middot;
+                            <a href="#">Terms &amp; Conditions</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <div class="modal fade" id="scoreModal" tabindex="-1" aria-labelledby="scoreModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="scoreModalLabel">Nhập kết quả</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row g-2">
+                            <div class="col">
+                                <label for="teamAScore" class="form-label">Số bàn thắng đội A</label>
+                                <input type="number" class="form-control" id="teamAScore" placeholder="0">
+                            </div>
+                            <div class="col">
+                                <label for="teamBScore" class="form-label">Số bàn thắng đội B</label>
+                                <input type="number" class="form-control" id="teamBScore" placeholder="0">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" id="updateScored">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="createMatchModal" tabindex="-1" aria-labelledby="createMatchModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createMatchModalLabel">Thêm trận đấu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="matchForm">
+                        <div class="mb-3">
+                            <label for="startTime" class="form-label">Thời gian bắt đầu</label>
+                            <input type="datetime-local" class="form-control" id="startTime" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="endTime" class="form-label">Thời gian kết thúc</label>
+                            <input type="datetime-local" class="form-control" id="endTime" required>
+                        </div>
+
+                        <label for="teamAAId" class="form-label">Sân</label>
+                        <select class="form-select" id="teamAId" style="width: 100%;">
+                            <option value="">Đội A</option>
+                        </select>
+
+                        <label for="teamBId" class="form-label">Sân</label>
+                        <select class="form-select" id="teamBId" style="width: 100%;">
+                            <option value="">Đội B</option>
+                        </select>
+                        <label for="fieldId" class="form-label">Sân</label>
+                        <select class="form-select" id="fieldId" style="width: 100%;">
+                            <option value="">Sân bóng A</option>
+                        </select>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" onclick="createMatch()">Thêm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <script src="/js/scripts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
+        crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetchMatchData();
+
+
+            $("#updateScored").click(function () {
+                var scoreTeamA = $('#teamAScore').val(); // Thêm dấu $ trước '#teamAScore' và gọi .val() đúng cách
+                var scoreTeamB = $('#teamBScore').val();
+                var matchId = $(this).attr("matchId"); // Cú pháp đúng, không cần sửa
+
+                var formData = new FormData();
+                formData.append("scoredTeamA", scoreTeamA);
+                formData.append("scoredTeamB", scoreTeamB);
+                formData.append("id", matchId);
+
+                $.ajax({
+                    url: "/api/match/update-scored",
+                    type: "POST",
+                    processData: false, // Không xử lý dữ liệu FormData thành query string
+                    contentType: false, // Không đặt Content-Type để jQuery tự động xử lý
+                    data: formData,
+                    success: function (response) {
+                        if (response.status == 1000) {
+                            Swal.fire({
+                                title: "Tỉ số cập nhật thành công!",
+                                icon: "success",
+                                confirmButtonText: "OK"
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: "Tỉ số cập nhật thất bại!",
+                                text: response.message,
+                                icon: "error",
+                                confirmButtonText: "OK"
+                            }).then(() => {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error("Lỗi:", xhr.responseText);
+                        Swal.fire({
+                            title: "Lỗi hệ thống!",
+                            text: "Không thể cập nhật tỉ số.",
+                            icon: "error",
+                            confirmButtonText: "OK"
+                        });
+                    }
+                });
+
+
+            })
+
+
+
+        });
+
+        let dataTable;
+
+        function fetchMatchData() {
+            fetch("/api/match/get-all") // Thay bằng API thực tế
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status !== 1000 || !data.data) {
+                        console.error("Lỗi khi lấy dữ liệu trận đấu!");
+                        return;
+                    }
+
+                    const statusMap = {
+                        "NOT_STARTED": { text: "Chưa bắt đầu", color: "text-bg-secondary" },
+                        "IN_PROGRESS": { text: "Đang diễn ra", color: "text-bg-success" },
+                        "FINISHED": { text: "Kết thúc", color: "text-bg-warning" },
+                        "CANCELED": { text: "Hủy bỏ", color: "text-bg-danger" }
+                    };
+
+                    const matches = data.data.map(match => {
+                        const startDate = new Date(match.start_time);
+                        const endDate = new Date(match.end_time);
+                        const status = statusMap[match.status] || { text: "Không xác định", color: "badge-dark" };
+
+                        let actionButtons = "";
+                        if (match.status === "NOT_STARTED") {
+                            actionButtons = `
+                        <button class="btn btn-warning btn-sm" onclick="updateScored(${match.id},'${match.score_teama}','${match.score_teamb}')">Cập nhật tỉ số</button>
+                        <button class="btn btn-danger btn-sm" onclick="cancelMatch(${match.id})">Hủy</button>
+                    `;
+                        } else if (match.status === "IN_PROGRESS") {
+                            actionButtons = `
+                        <button class="btn btn-primary btn-sm" onclick="updateScored(${match.id},'${match.score_teama}','${match.score_teamb}')">Cập nhật tỉ số</button>
+                        <button class="btn btn-warning btn-sm" onclick="finishMatch(${match.id})">Kết thúc</button>
+                        <button class="btn btn-danger btn-sm" onclick="cancelMatch(${match.id})">Hủy</button>
+                    `;
+                        }
+
+                        return [
+                            match.id, // ID
+                            startDate.toISOString().split('T')[0], // Ngày đá
+                            startDate.toTimeString().split(' ')[0], // Giờ đá
+                            endDate.toTimeString().split(' ')[0], // Giờ kết thúc
+                            match.field, // Sân bóng
+                            `<span class="badge ${status.color}">${status.text}</span>`, // Trạng thái
+                            `<div style="display: flex; align-items: center;">
+                        <img src="${match.teamALogo ? match.teamALogo : 'https://via.placeholder.com/50'}" 
+                             alt="Logo đội A" class="img-thumbnail" style="width: 50px; height: 50px; margin-right: 10px;">
+                        ${match.teamA}
+                     </div>`, // Đội A
+                            `${match.score_teama} - ${match.score_teamb}`, // Tỉ số
+                            `<div style="display: flex; align-items: center;">
+                        <img src="${match.teamBLogo ? match.teamBLogo : 'https://via.placeholder.com/50'}" 
+                             alt="Logo đội B" class="img-thumbnail" style="width: 50px; height: 50px; margin-right: 10px;">
+                        ${match.teamB}
+                     </div>`, // Đội B
+                            actionButtons // Hành động
+                        ];
+                    });
+
+                    if (dataTable) {
+                        dataTable.destroy();
+                        document.getElementById("datatablesSimple").innerHTML = "";
+                    }
+
+                    dataTable = new simpleDatatables.DataTable("#datatablesSimple", {
+                        data: {
+                            headings: ["ID", "Ngày đá", "Giờ đá", "Giờ kết thúc", "Sân bóng", "Trạng thái", "Đội A", "Tỉ số", "Đội B", "Hành động"],
+                            data: matches
+                        },
+                        columns: [{ select: 9, sortable: false }],
+                        labels: {
+                            placeholder: "Tìm kiếm...",
+                            noRows: "Không có dữ liệu",
+                            info: "Hiển thị {start} - {end} của {rows} trận",
+                            noResults: "Không tìm thấy kết quả"
+                        }
+                    });
+                })
+                .catch(error => console.error("Lỗi khi gọi API:", error));
+        }
+
+        function updateScored(id, scoredTeamA, scoredTeamB) {
+            $('#scoreModal').modal('show')
+            $('#teamAScore').val(scoredTeamA)
+            $('#teamBScore').val(scoredTeamB)
+            $("#updateScored").attr("matchId", id)
+        }
+
+        function finishMatch(id) {
+            Swal.fire({
+                title: "Bạn có chắc muốn kết thúc trận đấu này?",
+                text: "Hành động này không thể hoàn tác!",
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Xác nhận",
+                cancelButtonText: "Hủy"
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+
+                    $.ajax({
+                        url: "/api/match/finish?id=" + id,
+                        type: "POST",
+                        success: function (response) {
+                            if (response.status == 1000) {
+                                Swal.fire({
+                                    title: "Kết thúc trận đấu thành công!",
+                                    icon: "success",
+                                    confirmButtonText: "OK"
+                                }).then(() => {
+                                    location.reload(); // Reload sau khi đóng thông báo
+                                })
+
+                            } else {
+                                Swal.fire({
+                                    title: "Kết thúc trận đấu thất bại!",
+                                    text: response.message,
+                                    icon: "danger",
+                                    confirmButtonText: "OK"
+                                }).then(() => {
+                                    location.reload(); // Reload sau khi đóng thông báo
+                                })
+                            }
+                        },
+                        error: function (xhr) {
+                            // alert("Sửa thất bại: " + xhr.responseText);
+                        }
+                    })
+                }
+            });
+        }
+        function cancelMatch(id) {
+            Swal.fire({
+                title: "Bạn có muốn xác nhận hủy trận này?",
+                text: "Hành động này không thể hoàn tác!",
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Xác nhận",
+                cancelButtonText: "Hủy"
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+
+                    $.ajax({
+                        url: "/api/match/cancel?id=" + id,
+                        type: "POST",
+                        success: function (response) {
+                            if (response.status == 1000) {
+                                Swal.fire({
+                                    title: "Hủy trận thành công!",
+                                    icon: "success",
+                                    confirmButtonText: "OK"
+                                }).then(() => {
+                                    location.reload(); // Reload sau khi đóng thông báo
+                                })
+
+                            } else {
+                                Swal.fire({
+                                    title: "Hủy trận thất bại!",
+                                    text: response.message,
+                                    icon: "danger",
+                                    confirmButtonText: "OK"
+                                }).then(() => {
+                                    location.reload(); // Reload sau khi đóng thông báo
+                                })
+                            }
+                        },
+                        error: function (xhr) {
+                            // alert("Sửa thất bại: " + xhr.responseText);
+                        }
+                    })
+                }
+            });
+        }
+
+        function openAddPitchModal() {
+            // Hiển thị modal
+            $('#createMatchModal').modal('show');
+
+            // Chỉ khởi tạo Select2 nếu chưa có
+            if (!$("#teamAId").hasClass("select2-hidden-accessible")) {
+                $("#teamAId").select2({
+                    placeholder: "Chọn đội bóng A...",
+                    dropdownParent: $("#createMatchModal"), // Đảm bảo dropdown hiển thị đúng trong modal
+                    ajax: {
+                        url: "/api/team/get-all", // API trả về danh sách đội bóng
+                        dataType: "json",
+                        delay: 250,
+                        processResults: function (data) {
+                            return {
+                                results: data.data.map(team => ({
+                                    id: team.id,
+                                    text: team.name
+                                }))
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            }
+
+            if (!$("#teamBId").hasClass("select2-hidden-accessible")) {
+                $("#teamBId").select2({
+                    placeholder: "Chọn đội bóng B...",
+                    dropdownParent: $("#createMatchModal"), // Đảm bảo dropdown hiển thị đúng trong modal
+                    ajax: {
+                        url: "/api/team/get-all", // API trả về danh sách đội bóng
+                        dataType: "json",
+                        delay: 250,
+                        processResults: function (data) {
+                            return {
+                                results: data.data.map(team => ({
+                                    id: team.id,
+                                    text: team.name
+                                }))
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            }
+
+            if (!$("#fieldId").hasClass("select2-hidden-accessible")) {
+                $("#fieldId").select2({
+                    placeholder: "Chọn sân bóng",
+                    dropdownParent: $("#createMatchModal"), // Đảm bảo dropdown hiển thị đúng trong modal
+                    ajax: {
+                        url: "/api/field/get-all", // API trả về danh sách đội bóng
+                        dataType: "json",
+                        delay: 250,
+                        processResults: function (data) {
+                            return {
+                                results: data.data.map(team => ({
+                                    id: team.id,
+                                    text: team.name
+                                }))
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            }
+
+
+
+        }
+        function createMatch() {
+            var startTime = $('#startTime').val()
+            var endTime = $('#endTime').val()
+            var teamAId = $('#teamAId').val()
+            var teamBId = $('#teamBId').val()
+            var fieldId = $('#fieldId').val()
+
+            var formData = new FormData();
+            formData.append("startTime", startTime);
+            formData.append("endTime", endTime);
+            formData.append("teamAId", teamAId)
+            formData.append("teamBId", teamBId)
+            formData.append("fieldId", fieldId)
+
+            // alert(startTime + '-' + endTime + 'teama' + teamAId + 'san' + fieldId + 'teamB' + teamBId)
+            $.ajax({
+                url: "/api/match/create",
+                type: "POST",
+                processData: false,  // Không xử lý dữ liệu thành query string
+                contentType: false,  // Để trình duyệt tự động thiết lập content type phù hợp
+                data: formData,
+                success: function (response) {
+                    // alert("Thêm trận đấu thành công!");
+                    Swal.fire({
+                        title: "Thêm trận đấu thành công!",
+                        // text: response.message,
+                        icon: "susscess",
+                        confirmButtonText: "OK"
+                    }).then(() => {
+                        location.reload(); // Reload sau khi đóng thông báo
+                    })
+                    // location.reload();
+                },
+                error: function (xhr) {
+                    // alert("Thêm trận đấu thất bại: " + xhr.responseText);
+
+                    Swal.fire({
+                        title: "Thêm trận đấu thất bại!",
+                        text: xhr.responseText,
+                        icon: "susscess",
+                        confirmButtonText: "OK"
+                    }).then(() => {
+                        location.reload(); // Reload sau khi đóng thông báo
+                    })
+                }
+            });
+        }
+
+    </script>
+</body>
+
+</html>
